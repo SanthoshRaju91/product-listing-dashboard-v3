@@ -30,23 +30,41 @@ export default function Dashboard() {
   const [contentObservability, setContentObservability] = useState({});
   const [offers, setOffers] = useState({});
   const [ratings, setRatings] = useState({});
+  const [coScore, setCoScore] = useState(0);
+  const [offScore, setOffScore] = useState(0);
+  const [ratScore, setRatScore] = useState(0);
+
   const { id } = useParams();
+
+  const getScore = (score) => {
+    const [scored] = score.split("/");
+    return parseInt(scored);
+  };
 
   const prepareContentObservability = (details) => {
     if (details.listings && details.listings["content-observability"]) {
-      setContentObservability(details.listings["content-observability"]);
+      const listings = details.listings["content-observability"];
+      const score = listings["score"];
+      setCoScore(getScore(score));
+      setContentObservability(listings);
     }
   };
 
   const prepareOffers = (details) => {
-    if (details.listings && details.listings["offers"]) {
-      setOffers(details.listings["offers"]);
+    if (details.listings && details.listings["offering"]) {
+      const listings = details.listings["offering"];
+      const score = listings["score"];
+      setOffScore(getScore(score));
+      setOffers(listings);
     }
   };
 
   const prepareRatings = (details) => {
     if (details.listings && details.listings["ratings"]) {
-      setRatings(details.listings["ratings"]);
+      const listings = details.listings["ratings"];
+      const score = listings["score"];
+      setRatScore(getScore(score));
+      setRatings(listings);
     }
   };
 
@@ -55,7 +73,7 @@ export default function Dashboard() {
     datasets: [
       {
         label: "Listings",
-        data: [2, 0, 0],
+        data: [coScore, offScore, ratScore],
         backgroundColor: "rgba(255, 99, 132, 0.2)",
         borderColor: "rgba(255, 99, 132, 1)",
         borderWidth: 1,
@@ -123,7 +141,7 @@ export default function Dashboard() {
               <Flex direction="row" py={6} justifyContent="space-between">
                 <Flex direction="column" gap={4}>
                   <Flex direction="row" alignItems="center" gap={2}>
-                    <Link to="/main/listing">
+                    <Link to="/main/listings">
                       <AiOutlineArrowLeft />
                     </Link>
                     <Heading as="h2" fontSize="xl" textColor="blue.800">

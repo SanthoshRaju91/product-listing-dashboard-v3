@@ -17,6 +17,7 @@ import Main from "./pages/main";
 import Generate from "./pages/main/generate";
 import Listings from "./pages/main/listings";
 import Dashboard from "./pages/dashboard";
+import Index from "./pages";
 
 ChartJS.register(
   RadialLinearScale,
@@ -31,8 +32,9 @@ function App() {
   return (
     <Box>
       <Header />
-      <BrowserRouter>
+      <BrowserRouter basename="/">
         <Routes>
+          <Route path="/" element={<Index />} />
           <Route path="/main" element={<Main />}>
             <Route path="generate" element={<Generate />} />
             <Route path="listings" element={<Listings />} />
