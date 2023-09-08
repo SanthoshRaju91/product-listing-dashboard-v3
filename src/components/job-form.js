@@ -28,7 +28,7 @@ export function JobForm({ onSubmit, isSubmitting = false }) {
               jobName: "",
               itemPageUrl: "",
             }}
-            onSubmit={(values) => console.log(values)}
+            onSubmit={(values) => onSubmit(values.jobName, values.itemPageUrl)}
           >
             {({ handleSubmit, errors, touched }) => (
               <form onSubmit={handleSubmit}>
@@ -86,6 +86,7 @@ export function JobForm({ onSubmit, isSubmitting = false }) {
                     </FormControl>
                   </VStack>
                   <Button
+                    type="submit"
                     colorScheme="blue"
                     size="md"
                     fontWeight="normal"

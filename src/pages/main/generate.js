@@ -14,7 +14,7 @@ export default function Generate() {
       const response = await submit(jobName, itemPageUrl);
       toast.info(response);
     } catch (err) {
-      console.error(err);
+      toast.error("Failed to submitted. Please try again!!");
     } finally {
       setIsSubmitting(false);
     }
