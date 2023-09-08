@@ -9,6 +9,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 import { Header } from "./components/header";
 import Main from "./pages/main";
@@ -38,6 +40,7 @@ function App() {
           <Route path="/dashboard/:id" element={<Dashboard />} />
         </Routes>
       </BrowserRouter>
+      <ToastContainer />
     </Box>
   );
 }
