@@ -131,7 +131,17 @@ export default function Dashboard() {
 
   return (
     <Box className="dashboard">
-      {isLoading && <Spinner />}
+      {isLoading && (
+        <VStack py={24}>
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+          />
+        </VStack>
+      )}
 
       {!isLoading && details.job_name && (
         <Flex direction="column" gap={2}>

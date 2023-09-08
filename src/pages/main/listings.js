@@ -70,7 +70,16 @@ export default function Listings() {
           </Tr>
         </Thead>
         <Tbody>
-          {isLoading && <Spinner />}
+          {isLoading && (
+            <Tr>
+              <Td></Td>
+              <Td></Td>
+              <Td>
+                <Spinner />
+              </Td>
+              <Td></Td>
+            </Tr>
+          )}
           {!isLoading &&
             listings.length > 0 &&
             listings.map((listing, index) => (

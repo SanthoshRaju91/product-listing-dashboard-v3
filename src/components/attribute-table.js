@@ -11,7 +11,7 @@ import {
   Button,
   Icon,
 } from "@chakra-ui/react";
-import { AiOutlineCheckCircle } from "react-icons/ai";
+import { AiFillCheckCircle } from "react-icons/ai";
 
 import { IssuesContainer } from "./issue-container";
 
@@ -54,8 +54,8 @@ export function AttributeTable({ attributes }) {
               {attribute.issues.length > 0 ? (
                 <IssuesContainer issues={attribute.issues} />
               ) : (
-                <Flex direction="row" alignItems="center" gap={2}>
-                  <Icon as={AiOutlineCheckCircle} w="4" h="4" />
+                <Flex direction="row" alignItems="center" gap={2} w="100px">
+                  <Icon as={AiFillCheckCircle} w="6" h="6" color="green.500" />
                   <Text fontSize="sm" textColor="gray.700">
                     No Issues
                   </Text>

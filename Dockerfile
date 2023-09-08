@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # Runner stage
-FROM node:18-alpine
+FROM nginx:1.19.0
 
 WORKDIR /usr/share/nginx/html
 
