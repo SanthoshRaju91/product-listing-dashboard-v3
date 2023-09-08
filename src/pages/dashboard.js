@@ -1,9 +1,9 @@
-"use client";
-
+import { useState, useEffect } from "react";
 import {
   Box,
   Flex,
   Heading,
+  Spinner,
   Stat,
   StatGroup,
   StatLabel,
@@ -17,205 +17,268 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { Radar } from "react-chartjs-2";
 
 import { AppContainer } from "../components/app-container";
 import { AttributeTable } from "../components/attribute-table";
+import getDetails from "../services/details";
 
 export default function Dashboard() {
-  const getStatMetricsColor = () => {
-    const score = 4;
-    if (score > 3 && score <= 5) {
-      return "green.700";
-    } else if (score > 2 && score <= 3) {
-      return "orange.700";
-    } else {
-      return "red.700";
+  const [isLoading, setIsLoading] = useState(true);
+  const [details, setDetails] = useState({});
+  const [contentObservability, setContentObservability] = useState({});
+  const [offers, setOffers] = useState({});
+  const [ratings, setRatings] = useState({});
+  const { id } = useParams();
+
+  const prepareContentObservability = (details) => {
+    if (details.listings && details.listings["content-observability"]) {
+      setContentObservability(details.listings["content-observability"]);
     }
+  };
+
+  const prepareOffers = (details) => {
+    if (details.listings && details.listings["offers"]) {
+      setOffers(details.listings["offers"]);
+    }
+  };
+
+  const prepareRatings = (details) => {
+    if (details.listings && details.listings["ratings"]) {
+      setRatings(details.listings["ratings"]);
+    }
+  };
+
+  const data = {
+    labels: ["Content & Discoverability", "Offers", "Ratings"],
+    datasets: [
+      {
+        label: "Listings",
+        data: [2, 0, 0],
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgba(255, 99, 132, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  useEffect(() => {
+    async function getPageDetails(id) {
+      try {
+        const details = await getDetails(id);
+        setDetails(details);
+        prepareContentObservability(details);
+        prepareOffers(details);
+        prepareRatings(details);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    if (id) {
+      getPageDetails(id);
+    }
+  }, [id]);
+
+  const getStatMetricsColor = (prediction) => {
+    if (prediction === "bad") {
+      return "red.700";
+    } else if (prediction === "good") {
+      return "green.700";
+    } else {
+      return "gray.700";
+    }
+  };
+
+  const getListingCount = (listing) => {
+    if (listing && listing.attributes) {
+      return listing.attributes.length;
+    }
+    return 0;
+  };
+
+  const getAttributes = (listing) => {
+    if (listing && listing.attributes) {
+      const attributes = listing.attributes.map((attribute) => ({
+        name: attribute.name,
+        value: attribute.value,
+        issues: attribute.issues.map((issue) => issue.reason),
+      }));
+      return attributes;
+    }
+    return [];
   };
 
   return (
     <Box className="dashboard">
-      <Flex direction="column" gap={2} background="gray.100">
-        <Box>
-          <AppContainer>
-            <Flex></Flex>
-            <Flex direction="row" py={6}>
-              <Flex direction="column" gap={4}>
-                <Flex direction="row" alignItems="center" gap={2}>
-                  <Link to="/main/listing">
-                    <AiOutlineArrowLeft />
-                  </Link>
-                  <Heading as="h2" fontSize="xl" textColor="blue.800">
-                    ZARA-CROFT
-                  </Heading>
+      {isLoading && <Spinner />}
+
+      {!isLoading && details.job_name && (
+        <Flex direction="column" gap={2}>
+          <Box>
+            <AppContainer>
+              <Flex></Flex>
+              <Flex direction="row" py={6} justifyContent="space-between">
+                <Flex direction="column" gap={4}>
+                  <Flex direction="row" alignItems="center" gap={2}>
+                    <Link to="/main/listing">
+                      <AiOutlineArrowLeft />
+                    </Link>
+                    <Heading as="h2" fontSize="xl" textColor="blue.800">
+                      {details.job_name}
+                    </Heading>
+                  </Flex>
+                  <Flex direction="row" alignItems="flex-start" gap={1}>
+                    <Box w="15%">
+                      <Text
+                        fontSize="sm"
+                        fontWeight="medium"
+                        textColor="gray.500"
+                      >
+                        Item page url:{" "}
+                      </Text>
+                    </Box>
+                    <Text
+                      fontSize="sm"
+                      textColor="blue.600"
+                      textDecoration="underline"
+                    >
+                      {details.item_page_url}
+                    </Text>
+                  </Flex>
+                  <StatGroup w="40%" gap={4}>
+                    <Stat
+                      borderWidth={1}
+                      borderColor="gray.400"
+                      p={2}
+                      borderRadius="md"
+                    >
+                      <StatLabel fontSize="xs" textColor="gray.500">
+                        Overall Score
+                      </StatLabel>
+                      <StatNumber fontSize="md" textColor="gray.600">
+                        {details.overall_score}
+                      </StatNumber>
+                    </Stat>
+                    <Stat
+                      borderWidth={1}
+                      borderColor="gray.400"
+                      p={2}
+                      borderRadius="md"
+                    >
+                      <StatLabel fontSize="xs" textColor="gray.500">
+                        Metrics prediction
+                      </StatLabel>
+                      <StatNumber
+                        fontSize="md"
+                        textColor={getStatMetricsColor(
+                          details.metrics_prediction
+                        )}
+                      >
+                        {details.metrics_prediction}
+                      </StatNumber>
+                    </Stat>
+                  </StatGroup>
                 </Flex>
-                <Flex direction="row" alignItems="center" gap={1}>
-                  <Text fontSize="sm" fontWeight="medium" textColor="gray.500">
-                    Item page url:{" "}
-                  </Text>
-                  <Text
-                    fontSize="sm"
-                    textColor="blue.600"
-                    textDecoration="underline"
-                  >
-                    https://item.rakuten.co.jp/wakasugi/wakaba/?s-id=top_normal_browsehist&xuseflg_ichiba01=10000295
-                  </Text>
-                </Flex>
-                <StatGroup w="40%" gap={4}>
-                  <Stat
-                    borderWidth={1}
-                    borderColor="gray.400"
-                    p={2}
-                    borderRadius="md"
-                  >
-                    <StatLabel fontSize="xs" textColor="gray.500">
-                      Overall Score
-                    </StatLabel>
-                    <StatNumber fontSize="md" textColor="gray.600">
-                      4 / 5
-                    </StatNumber>
-                  </Stat>
-                  <Stat
-                    borderWidth={1}
-                    borderColor="gray.400"
-                    p={2}
-                    borderRadius="md"
-                  >
-                    <StatLabel fontSize="xs" textColor="gray.500">
-                      Metrics prediction
-                    </StatLabel>
-                    <StatNumber fontSize="md" textColor={getStatMetricsColor()}>
-                      Good
-                    </StatNumber>
-                  </Stat>
-                </StatGroup>
+
+                <Box w="250px" h="250px">
+                  <Radar
+                    data={data}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      scales: {
+                        yAxes: [
+                          {
+                            ticks: {
+                              beginAtZero: true,
+                            },
+                          },
+                        ],
+                      },
+                    }}
+                  />
+                </Box>
               </Flex>
-            </Flex>
+            </AppContainer>
+          </Box>
+
+          <AppContainer>
+            <Tabs w="fit-content">
+              <TabList>
+                <Tab fontSize="sm">
+                  Content & Discoverability (
+                  {getListingCount(contentObservability)})
+                </Tab>
+                <Tab fontSize="sm">Offers ({getListingCount(offers)})</Tab>
+                <Tab fontSize="sm">Ratings ({getListingCount(ratings)})</Tab>
+              </TabList>
+
+              <TabPanels>
+                <TabPanel>
+                  <VStack alignItems="flex-start" gap={6}>
+                    <Stat
+                      p={3}
+                      borderWidth={1}
+                      borderColor="gray.400"
+                      borderRadius="md"
+                    >
+                      <StatLabel fontSize="xs" textColor="gray.500">
+                        Overall score
+                      </StatLabel>
+                      <StatNumber fontSize="md" textColor="gray.600">
+                        {contentObservability["score"]}
+                      </StatNumber>
+                    </Stat>
+
+                    <AttributeTable
+                      attributes={getAttributes(contentObservability)}
+                    />
+                  </VStack>
+                </TabPanel>
+                <TabPanel>
+                  <VStack alignItems="flex-start" gap={6}>
+                    <Stat
+                      p={3}
+                      borderWidth={1}
+                      borderColor="gray.400"
+                      borderRadius="md"
+                    >
+                      <StatLabel fontSize="xs" textColor="gray.500">
+                        Overall score
+                      </StatLabel>
+                      <StatNumber fontSize="md" textColor="gray.600">
+                        {offers["score"]}
+                      </StatNumber>
+                    </Stat>
+                    <AttributeTable attributes={getAttributes(offers)} />
+                  </VStack>
+                </TabPanel>
+                <TabPanel>
+                  <VStack alignItems="flex-start" gap={6}>
+                    <Stat
+                      p={3}
+                      borderWidth={1}
+                      borderColor="gray.400"
+                      borderRadius="md"
+                    >
+                      <StatLabel fontSize="xs" textColor="gray.500">
+                        Overall score
+                      </StatLabel>
+                      <StatNumber fontSize="md" textColor="gray.600">
+                        {ratings["score"]}
+                      </StatNumber>
+                    </Stat>
+                    <AttributeTable attributes={getAttributes(ratings)} />
+                  </VStack>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           </AppContainer>
-        </Box>
-
-        <AppContainer>
-          <Tabs w="fit-content">
-            <TabList>
-              <Tab fontSize="sm">Content & Discoverability (7)</Tab>
-              <Tab fontSize="sm">Offers (2)</Tab>
-              <Tab fontSize="sm">Ratings (1)</Tab>
-            </TabList>
-
-            <TabPanels>
-              <TabPanel>
-                <VStack alignItems="flex-start" gap={6}>
-                  <Stat
-                    p={3}
-                    borderWidth={1}
-                    borderColor="gray.400"
-                    borderRadius="md"
-                  >
-                    <StatLabel fontSize="xs" textColor="gray.500">
-                      Overall score
-                    </StatLabel>
-                    <StatNumber fontSize="md" textColor="gray.600">
-                      2.0
-                    </StatNumber>
-                  </Stat>
-
-                  <AttributeTable
-                    attributes={[
-                      {
-                        name: "Item Name",
-                        value:
-                          "【楽天市場】【40%OFFクーポンで6,480円 11日2時まで】パーティードレス 結婚式 ワンピース ドレス 二次会 フォーマルドレス 体型カバー フォーマル お呼ばれ 服 服装 ミセス 大きいサイズ 大人 上品 20代 30代 40代 春 夏 秋 冬 総レース 袖付き 韓国 冬 小さいサイズ 袖あり ロング丈：パーティードレス通販！PourVous",
-                        issues: [],
-                        score: "100%",
-                      },
-                      {
-                        name: "Description",
-                        value:
-                          "【楽天市場】【40%OFFクーポンで6,480円 11日2時まで】パーティードレス 結婚式 ワンピース ドレス 二次会 フォーマルドレス 体型カバー フォーマル お呼ばれ 服 服装 ミセス 大きいサイズ 大人 上品 20代 30代 40代 春 夏 秋 冬 総レース 袖付き 韓国 冬 小さいサイズ 袖あり ロング丈：パーティードレス通販！PourVous",
-                        issues: ["No valid", "No coverage"],
-                        score: "75%",
-                      },
-                    ]}
-                  />
-                </VStack>
-              </TabPanel>
-              <TabPanel>
-                <VStack alignItems="flex-start" gap={6}>
-                  <Stat
-                    p={3}
-                    borderWidth={1}
-                    borderColor="gray.400"
-                    borderRadius="md"
-                  >
-                    <StatLabel fontSize="xs" textColor="gray.500">
-                      Overall score
-                    </StatLabel>
-                    <StatNumber fontSize="md" textColor="gray.600">
-                      2.0
-                    </StatNumber>
-                  </Stat>
-
-                  <AttributeTable
-                    attributes={[
-                      {
-                        name: "Item Name",
-                        value:
-                          "【楽天市場】【40%OFFクーポンで6,480円 11日2時まで】パーティードレス 結婚式 ワンピース ドレス 二次会 フォーマルドレス 体型カバー フォーマル お呼ばれ 服 服装 ミセス 大きいサイズ 大人 上品 20代 30代 40代 春 夏 秋 冬 総レース 袖付き 韓国 冬 小さいサイズ 袖あり ロング丈：パーティードレス通販！PourVous",
-                        issues: [],
-                        score: "100%",
-                      },
-                      {
-                        name: "Description",
-                        value:
-                          "【楽天市場】【40%OFFクーポンで6,480円 11日2時まで】パーティードレス 結婚式 ワンピース ドレス 二次会 フォーマルドレス 体型カバー フォーマル お呼ばれ 服 服装 ミセス 大きいサイズ 大人 上品 20代 30代 40代 春 夏 秋 冬 総レース 袖付き 韓国 冬 小さいサイズ 袖あり ロング丈：パーティードレス通販！PourVous",
-                        issues: ["No valid", "No coverage"],
-                        score: "75%",
-                      },
-                    ]}
-                  />
-                </VStack>
-              </TabPanel>
-              <TabPanel>
-                <VStack alignItems="flex-start" gap={6}>
-                  <Stat
-                    p={3}
-                    borderWidth={1}
-                    borderColor="gray.400"
-                    borderRadius="md"
-                  >
-                    <StatLabel fontSize="xs" textColor="gray.500">
-                      Overall score
-                    </StatLabel>
-                    <StatNumber fontSize="md" textColor="gray.600">
-                      2.0
-                    </StatNumber>
-                  </Stat>
-
-                  <AttributeTable
-                    attributes={[
-                      {
-                        name: "Item Name",
-                        value:
-                          "【楽天市場】【40%OFFクーポンで6,480円 11日2時まで】パーティードレス 結婚式 ワンピース ドレス 二次会 フォーマルドレス 体型カバー フォーマル お呼ばれ 服 服装 ミセス 大きいサイズ 大人 上品 20代 30代 40代 春 夏 秋 冬 総レース 袖付き 韓国 冬 小さいサイズ 袖あり ロング丈：パーティードレス通販！PourVous",
-                        issues: [],
-                        score: "100%",
-                      },
-                      {
-                        name: "Description",
-                        value:
-                          "【楽天市場】【40%OFFクーポンで6,480円 11日2時まで】パーティードレス 結婚式 ワンピース ドレス 二次会 フォーマルドレス 体型カバー フォーマル お呼ばれ 服 服装 ミセス 大きいサイズ 大人 上品 20代 30代 40代 春 夏 秋 冬 総レース 袖付き 韓国 冬 小さいサイズ 袖あり ロング丈：パーティードレス通販！PourVous",
-                        issues: ["No valid", "No coverage"],
-                        score: "75%",
-                      },
-                    ]}
-                  />
-                </VStack>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        </AppContainer>
-      </Flex>
+        </Flex>
+      )}
     </Box>
   );
 }
