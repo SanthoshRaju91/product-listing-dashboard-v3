@@ -34,7 +34,13 @@ export default function Listings() {
       }
     }
 
-    getAllListings();
+    const timer = setInterval(() => {
+      getAllListings();
+    }, 10000);
+
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
 
   const getStatusColor = (status) => {
