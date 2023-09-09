@@ -23,6 +23,7 @@ import { Radar } from "react-chartjs-2";
 import { AppContainer } from "../components/app-container";
 import { AttributeTable } from "../components/attribute-table";
 import getDetails from "../services/details";
+import { getItemDescription, getItemTitle } from "../services/generate";
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
@@ -128,6 +129,40 @@ export default function Dashboard() {
       return attributes;
     }
     return [];
+  };
+
+  const getPageDetails = async (id) => {
+    try {
+      const details = await getDetails(id);
+      setDetails(details);
+      prepareContentObservability(details);
+      prepareOffers(details);
+      prepareRatings(details);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onGenerate = async (name, text) => {
+    if (name === "description") {
+      try {
+        await getItemDescription(details.job_name, text);
+        await getPageDetails(id);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (name === "title") {
+      try {
+        await getItemTitle(details.job_name, text);
+        await getPageDetails(id);
+      } catch (err) {
+        console.error(err);
+      }
+    }
   };
 
   return (
@@ -265,6 +300,7 @@ export default function Dashboard() {
                     </Stat>
 
                     <AttributeTable
+                      onGenerate={onGenerate}
                       attributes={getAttributes(contentObservability)}
                     />
                   </VStack>

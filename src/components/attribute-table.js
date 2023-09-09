@@ -92,7 +92,15 @@ function PriceListing({ attribute }) {
   );
 }
 
-export function AttributeTable({ attributes, format = "simple" }) {
+export function AttributeTable({ attributes, format = "simple", onGenerate }) {
+  const handleGenerate = (name, text) => {
+    if (name === "description") {
+      onGenerate("description", text);
+    } else {
+      onGenerate("title", text);
+    }
+  };
+
   return (
     <Table
       background="white"
@@ -152,7 +160,13 @@ export function AttributeTable({ attributes, format = "simple" }) {
               {attribute.issues.length > 0 &&
                 !attribute.generated &&
                 attribute.name !== "Image Quality Analysis" && (
-                  <Button colorScheme="blue" size="sm">
+                  <Button
+                    colorScheme="blue"
+                    size="sm"
+                    onClick={() =>
+                      handleGenerate(attribute.name, attribute.value)
+                    }
+                  >
                     Generate using AI
                   </Button>
                 )}
