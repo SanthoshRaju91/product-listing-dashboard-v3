@@ -169,13 +169,15 @@ export default function Dashboard() {
                         Item page url:{" "}
                       </Text>
                     </Box>
-                    <Text
-                      fontSize="sm"
-                      textColor="blue.600"
-                      textDecoration="underline"
-                    >
-                      {details.item_page_url}
-                    </Text>
+                    <a href={`${details.item_page_url}`} target="_blank">
+                      <Text
+                        fontSize="sm"
+                        textDecoration="underline"
+                        textColor="blue.500"
+                      >
+                        {details.item_page_url}
+                      </Text>
+                    </a>
                   </Flex>
                   <StatGroup w="40%" gap={4}>
                     <Stat

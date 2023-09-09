@@ -11,6 +11,7 @@ import {
   LinkBox,
   Text,
   Spinner,
+  Flex,
 } from "@chakra-ui/react";
 import moment from "moment";
 
@@ -63,75 +64,82 @@ export default function Listings() {
 
   return (
     <AppContainer>
-      <Table
-        variant="simple"
-        borderRadius="md"
-        borderWidth={1}
-        borderColor="gray.200"
-      >
-        <Thead>
-          <Tr>
-            <Th fontSize="xs">JOB NAME</Th>
-            <Th fontSize="xs">ITEM PAGE URL</Th>
-            <Th fontSize="xs">TRIGGERED ON</Th>
-            <Th fontSize="xs">STATUS</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {isLoading && (
+      <Flex direction="column" gap={4}>
+        <Text textColor="gray.500" fontSize="sm">
+          The submitted jobs are processed via a pipeline, the status will be
+          reflected in a periodic interval. Please wait for your job to
+          complete.
+        </Text>
+        <Table
+          variant="simple"
+          borderRadius="md"
+          borderWidth={1}
+          borderColor="gray.200"
+        >
+          <Thead>
             <Tr>
-              <Td></Td>
-              <Td></Td>
-              <Td>
-                <Spinner />
-              </Td>
-              <Td></Td>
+              <Th fontSize="xs">JOB NAME</Th>
+              <Th fontSize="xs">ITEM PAGE URL</Th>
+              <Th fontSize="xs">TRIGGERED ON</Th>
+              <Th fontSize="xs">STATUS</Th>
             </Tr>
-          )}
-          {!isLoading &&
-            listings.length > 0 &&
-            listings.map((listing, index) => (
-              <Tr key={index}>
+          </Thead>
+          <Tbody>
+            {isLoading && (
+              <Tr>
+                <Td></Td>
+                <Td></Td>
                 <Td>
-                  <LinkBox
-                    fontSize="sm"
-                    textColor="blue.500"
-                    textDecoration="underline"
-                  >
-                    <Link to={`/dashboard/${listing.jobName}`}>
-                      {listing.jobName}
-                    </Link>
-                  </LinkBox>
+                  <Spinner />
                 </Td>
-                <Td>
-                  <LinkBox
-                    fontSize="sm"
-                    textColor="blue.500"
-                    textDecoration="underline"
-                  >
-                    <a
-                      target="_blank"
-                      href="https://item.rakuten.co.jp/wakasugi/wakaba/?s-id=top_normal_browsehist&xuseflg_ichiba01=10000295"
-                      rel="noreferrer"
-                    >
-                      {listing.itemUrl}
-                    </a>
-                  </LinkBox>
-                </Td>
-                <Td>
-                  <Text fontSize="sm">
-                    {getFormattedDate(listing.createdDate)}
-                  </Text>
-                </Td>
-                <Td>
-                  <Badge colorScheme={getStatusColor(listing.status)}>
-                    {listing.status}
-                  </Badge>
-                </Td>
+                <Td></Td>
               </Tr>
-            ))}
-        </Tbody>
-      </Table>
+            )}
+            {!isLoading &&
+              listings.length > 0 &&
+              listings.map((listing, index) => (
+                <Tr key={index}>
+                  <Td>
+                    <LinkBox
+                      fontSize="sm"
+                      textColor="blue.500"
+                      textDecoration="underline"
+                    >
+                      <Link to={`/dashboard/${listing.jobName}`}>
+                        {listing.jobName}
+                      </Link>
+                    </LinkBox>
+                  </Td>
+                  <Td>
+                    <LinkBox
+                      fontSize="sm"
+                      textColor="blue.500"
+                      textDecoration="underline"
+                    >
+                      <a
+                        target="_blank"
+                        href="https://item.rakuten.co.jp/wakasugi/wakaba/?s-id=top_normal_browsehist&xuseflg_ichiba01=10000295"
+                        rel="noreferrer"
+                      >
+                        {listing.itemUrl}
+                      </a>
+                    </LinkBox>
+                  </Td>
+                  <Td>
+                    <Text fontSize="sm">
+                      {getFormattedDate(listing.createdDate)}
+                    </Text>
+                  </Td>
+                  <Td>
+                    <Badge colorScheme={getStatusColor(listing.status)}>
+                      {listing.status}
+                    </Badge>
+                  </Td>
+                </Tr>
+              ))}
+          </Tbody>
+        </Table>
+      </Flex>
     </AppContainer>
   );
 }
