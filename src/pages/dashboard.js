@@ -247,6 +247,11 @@ export default function Dashboard() {
                       </StatNumber>
                     </Stat>
                   </StatGroup>
+                  <a
+                    href={`http://34.100.231.252:9001/?item=${details.job_name}`}
+                  >
+                    Generate layout page
+                  </a>
                 </Flex>
 
                 <Box w="250px" h="250px">
