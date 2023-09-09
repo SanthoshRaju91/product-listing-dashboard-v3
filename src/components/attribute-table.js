@@ -149,11 +149,13 @@ export function AttributeTable({ attributes, format = "simple" }) {
               </Box>
             </Td>
             <Td>
-              {attribute.issues.length > 0 && !attribute.generated && (
-                <Button colorScheme="blue" size="sm">
-                  Generate using AI
-                </Button>
-              )}
+              {attribute.issues.length > 0 &&
+                !attribute.generated &&
+                attribute.name !== "Image Quality Analysis" && (
+                  <Button colorScheme="blue" size="sm">
+                    Generate using AI
+                  </Button>
+                )}
               {attribute.issues.length > 0 && attribute.generated && (
                 <Flex direction="row" alignItems="center" gap={1}>
                   <Icon as={AiFillCheckCircle} w="6" h="6" color="green.500" />
