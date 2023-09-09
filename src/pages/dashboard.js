@@ -123,6 +123,7 @@ export default function Dashboard() {
         name: attribute.name,
         value: attribute.value,
         issues: attribute.issues.map((issue) => issue.reason),
+        generated: attribute.generated,
       }));
       return attributes;
     }
@@ -281,7 +282,10 @@ export default function Dashboard() {
                         {offers["score"]}
                       </StatNumber>
                     </Stat>
-                    <AttributeTable attributes={getAttributes(offers)} />
+                    <AttributeTable
+                      format="pricing"
+                      attributes={getAttributes(offers)}
+                    />
                   </VStack>
                 </TabPanel>
                 <TabPanel>
