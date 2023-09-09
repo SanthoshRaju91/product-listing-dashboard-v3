@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Box,
+  Button,
   Flex,
   Heading,
   Spinner,
@@ -184,8 +185,8 @@ export default function Dashboard() {
           <Box>
             <AppContainer>
               <Flex></Flex>
-              <Flex direction="row" py={6} justifyContent="space-between">
-                <Flex direction="column" gap={4}>
+              <Flex direction="row" py={4} justifyContent="space-between">
+                <Flex direction="column" gap={8}>
                   <Flex direction="row" alignItems="center" gap={2}>
                     <Link to="/main/listings">
                       <AiOutlineArrowLeft />
@@ -195,7 +196,7 @@ export default function Dashboard() {
                     </Heading>
                   </Flex>
                   <Flex direction="row" alignItems="flex-start" gap={1}>
-                    <Box w="15%">
+                    <Box w="25%">
                       <Text
                         fontSize="sm"
                         fontWeight="medium"
@@ -214,7 +215,7 @@ export default function Dashboard() {
                       </Text>
                     </a>
                   </Flex>
-                  <StatGroup w="40%" gap={4}>
+                  <StatGroup w="80%" gap={4}>
                     <Stat
                       borderWidth={1}
                       borderColor="gray.400"
@@ -247,11 +248,22 @@ export default function Dashboard() {
                       </StatNumber>
                     </Stat>
                   </StatGroup>
-                  <a
-                    href={`http://34.100.231.252:9001/?item=${details.job_name}`}
+                  <Button
+                    variant="solid"
+                    size="md"
+                    fontSize="sm"
+                    colorScheme="blue"
+                    onClick={() =>
+                      window
+                        .open(
+                          `http://34.100.231.252:9001/?item=${details.job_name}`,
+                          "_blank"
+                        )
+                        .focus()
+                    }
                   >
-                    Generate layout page
-                  </a>
+                    Generate item page
+                  </Button>
                 </Flex>
 
                 <Box w="250px" h="250px">
